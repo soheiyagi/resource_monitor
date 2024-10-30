@@ -1,4 +1,4 @@
-``` pip install psutil GPUtil python-dotenv requests ```
+``` pip install psutil GPUtil python-dotenv requests setuptools ```
 
 ```
 # .env
