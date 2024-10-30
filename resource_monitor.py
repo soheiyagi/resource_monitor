@@ -25,7 +25,7 @@ def send_discord_notification(message):
 def check_resource_usage():
     """CPUとGPUの利用率をチェックし、閾値を超えた場合に通知"""
     # CPU使用率
-    cpu_usage = psutil.cpu_percent(interval=1)
+    cpu_usage = psutil.cpu_percent(interval=1,percpu=False)
     
     # メモリ使用率
     memory = psutil.virtual_memory()
