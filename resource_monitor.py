@@ -3,6 +3,7 @@ import GPUtil
 import time
 import requests
 import socket
+import subprocess
 from dotenv import load_dotenv
 import os
 
@@ -19,7 +20,6 @@ HOSTNAME = socket.gethostname()
 
 def send_discord_notification(message):
     """Discordに通知を送信"""
-    # ホスト名を通知メッセージに含める
     data = {"content": f"[{HOSTNAME}] {message}"}
     response = requests.post(DISCORD_WEBHOOK_URL, json=data)
     if response.status_code == 204:
@@ -27,9 +27,19 @@ def send_discord_notification(message):
     else:
         print("Discord通知エラー:", response.status_code, response.text)
 
+def is_container_running(container_name):
+    """特定のコンテナが実行中か確認"""
+    try:
+        result = subprocess.run(["docker", "ps", "--filter", f"name={container_name}", "--format", "{{.Names}}"],
+                                capture_output=True, text=True, check=True)
+        return container_name in result.stdout
+    except subprocess.CalledProcessError as e:
+        print(f"Dockerコマンドのエラー: {e}")
+        return False
+
 def check_resource_usage():
     """CPUとGPUの利用率をチェックし、閾値を超えた場合に通知"""
-    # CPU使用率
+    # 全コアの平均CPU使用率を取得
     cpu_usage_total = psutil.cpu_percent(interval=1, percpu=False)
     
     # メモリ使用率
@@ -43,6 +53,11 @@ def check_resource_usage():
     # ログ出力
     print(f"Total CPU Usage: {cpu_usage_total}%, Memory Usage: {memory_usage}%")
     print(f"GPU Usage: {gpu_usage}%")
+
+    # 特定のコンテナが実行中か確認
+    if is_container_running("ray-arm_container_tmp"):
+        print("ray-arm_container_tmpコンテナが実行中のため通知を除外")
+        return
 
     # 100%除外の設定が有効で、現在のCPUまたはGPU使用率が100%なら通知を除外
     if EXCLUDE_100_PERCENT and (cpu_usage_total == 100 or gpu_usage == 100):
