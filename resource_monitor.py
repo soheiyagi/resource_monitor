@@ -10,8 +10,8 @@ import os
 load_dotenv()
 
 DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
-CPU_THRESHOLD = float(os.getenv("CPU_THRESHOLD", 80.0))
-GPU_THRESHOLD = float(os.getenv("GPU_THRESHOLD", 75.0))
+CPU_THRESHOLD = float(os.getenv("CPU_THRESHOLD", 30.0))
+GPU_THRESHOLD = float(os.getenv("GPU_THRESHOLD", 20.0))
 EXCLUDE_100_PERCENT = os.getenv("EXCLUDE_100_PERCENT", "False").lower() == "true"
 
 # ホスト名（端末名）を取得
